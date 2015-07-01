@@ -29,6 +29,7 @@ var ImgCache = {
             cacheClearSize: 0,                      /* size in MB that triggers cache clear on init, 0 to disable */
             headers: {},                            /* HTTP headers for the download requests -- e.g: headers: { 'Accept': 'application/jpg' } */
             skipURIencoding: false                  /* enable if URIs are already encoded (skips call to sanitizeURI) */
+            trustAllHosts: false                    /* enable to accept all security certificates for download (FileTransfer wrapper)*/
         },
         overridables: {
             hash: function (s) {
@@ -410,7 +411,7 @@ var ImgCache = {
             if (isOnProgressAvailable) {
                 this.fileTransfer.onprogress = on_progress;
             }
-            return this.fileTransfer.download(uri, localPath, success_callback, error_callback, false, { 'headers': headers });
+            return this.fileTransfer.download(uri, localPath, success_callback, error_callback, ImgCache.options.trustAllHosts, { 'headers': headers });
         }
 
         var filesystem = this.filesystem;
