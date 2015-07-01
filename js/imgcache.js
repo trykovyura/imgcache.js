@@ -28,7 +28,7 @@ var ImgCache = {
             usePersistentCache: true,               /* false = use temporary cache storage */
             cacheClearSize: 0,                      /* size in MB that triggers cache clear on init, 0 to disable */
             headers: {},                            /* HTTP headers for the download requests -- e.g: headers: { 'Accept': 'application/jpg' } */
-            skipURIencoding: false                  /* enable if URIs are already encoded (skips call to sanitizeURI) */
+            skipURIencoding: false,                  /* enable if URIs are already encoded (skips call to sanitizeURI) */
             trustAllHosts: false                    /* enable to accept all security certificates for download (FileTransfer wrapper)*/
         },
         overridables: {
@@ -402,7 +402,7 @@ var ImgCache = {
         }
         this.filesystem = filesystem;    // only useful for CHROME
     };
-    Private.FileTransferWrapper.prototype.download = function (uri, localPath, success_callback, error_callback, on_progress) {
+    Private.FileTransferWrapper.prototype.download = function (uri, localPath, success_callback, error_callback, on_progress, trustAllHosts) {
 
         var headers = ImgCache.options.headers || {};
         var isOnProgressAvailable = (typeof on_progress === 'function');
@@ -411,7 +411,7 @@ var ImgCache = {
             if (isOnProgressAvailable) {
                 this.fileTransfer.onprogress = on_progress;
             }
-            return this.fileTransfer.download(uri, localPath, success_callback, error_callback, ImgCache.options.trustAllHosts, { 'headers': headers });
+            return this.fileTransfer.download(uri, localPath, success_callback, error_callback, trustAllHosts, { 'headers': headers });
         }
 
         var filesystem = this.filesystem;
@@ -662,7 +662,8 @@ var ImgCache = {
                 ImgCache.overridables.log('Download error code: ' + error.code, LOG_LEVEL_ERROR);
                 if (error_callback) { error_callback(); }
             },
-            on_progress
+            on_progress,
+            ImgCache.options.trustAllHosts
         );
     };
 
